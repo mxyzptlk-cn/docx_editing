@@ -3,7 +3,7 @@
 # Author: Mxyzptlk
 # Date: 2019/11/16
 
-# pyinstaller --clean --win-private-assemblies -D -w -i C:\Users\Mxyzptlk\Documents\PycharmProjects\docx_editing\logo.ico docx_win32_gui.py
+# v1.2
 # pyinstaller -D -w -i C:\Users\Mxyzptlk\Documents\PycharmProjects\docx_editing\logo.ico docx_win32_gui.py
 
 import PySimpleGUI as sg
