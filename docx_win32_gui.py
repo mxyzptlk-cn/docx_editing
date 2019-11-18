@@ -223,8 +223,8 @@ def docx_processing(file, path_prefix):
             elif f == 'WN-QR-2-1-B培训计划-1.5.docx':
                 doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
                 comm_task(doc, ret)
-                doc.replace_doc('变量a9', ret['变量9'][:8])
-                doc.replace_doc('系统（第一个）', ret2[0][0])
+                doc.replace_doc('变量a9', ret['变量9'][:7])
+                doc.replace_doc('系统第一个', ret2[0][0])
                 doc.replace_doc('子系统（第一个）', ret2[0][1])
                 doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
                 doc.close()
