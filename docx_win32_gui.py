@@ -18,7 +18,7 @@ from win32com.client import Dispatch
 from openpyxl import load_workbook as lb
 
 
-def days(str1, str2):
+def days(str1, str2):  # 计算周数，四舍五入
     date1 = datetime.datetime.strptime(str1, "%Y.%m.%d")
     date2 = datetime.datetime.strptime(str2, "%Y.%m.%d")
     num = round((date1 - date2).days / 7)
@@ -180,7 +180,7 @@ def docx_processing(file, path_prefix):
             doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
             doc.close()
             doc = None
-            gc.collect()
+            gc.collect()  # 强制内存回收，否则word程序进程指向无法重新定义
         for f in spc_list:
             if f == 'WN-QR-4-3-A项目验收报告-1.5.docx':
                 doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
