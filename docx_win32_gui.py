@@ -126,6 +126,8 @@ def read_from_xlsx(file):
         for i in range(1, 22):  # 变量1-21部分
             if ws['C' + str(i)].value:
                 ret['变量' + str(i)] = ws['C' + str(i)].value
+            else:
+                ret['变量' + str(i)] = ' '
         if ws['F2'].value and ws['G2'].value:
             for i in range(2, 102):  # 系统-子系统部分
                 temp = []
@@ -161,7 +163,7 @@ def docx_processing(file, path_prefix):
     ret, ret2 = read_from_xlsx(file)
     # comm_task即可处理的文档：
     com_list = ['WN-QR-0-4-A 项目实施进度表-1.5.docx', 'WN-QR-2-12-A项目上线评估报告-1.5.docx', 'WN-QR-1-1-A 项目启动告客户书-1.5.docx',
-                'WN-QR-0-3-A软件及升级包杀毒记录-1.5.docx', 'WN-QR-0-1-A项目启动会会议记录-1.5.docx']
+                'WN-QR-0-3-A软件及升级包杀毒记录-1.5.docx', 'WN-QR-0-1-A项目启动会会议记录-1.5.docx', '-----WN-QR-2-5-A数据准备与验收清单-1.5.docx']
     # comm_task之外需要另行做处理的文档：
     spc_list = ['WN-QR-4-3-A项目验收报告-1.5.docx', 'WN-QR-3-2-A系统切换方案-1.5.docx', 'WN-QR-2-4-A培训考核记录-1.5.docx',
                 'WN-QR-2-3-A培训签到表-1.5.docx', 'WN-QR-2-1-B培训计划-1.5.docx', 'WN-QR-1-4-A项目实施计划-1.5.docx',
