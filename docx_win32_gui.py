@@ -3,6 +3,9 @@
 # Author: Mxyzptlk
 # Date: 2019/11/16
 
+# pyinstaller --clean --win-private-assemblies -D -w -i C:\Users\Mxyzptlk\Documents\PycharmProjects\docx_editing\logo.ico docx_win32_gui.py
+# pyinstaller -D -w -i C:\Users\Mxyzptlk\Documents\PycharmProjects\docx_editing\logo.ico docx_win32_gui.py
+
 import PySimpleGUI as sg
 
 import os
@@ -16,8 +19,8 @@ from openpyxl import load_workbook as lb
 
 
 def days(str1, str2):
-    date1 = datetime.datetime.strptime(str1, "%Y年%m月%d日")
-    date2 = datetime.datetime.strptime(str2, "%Y年%m月%d日")
+    date1 = datetime.datetime.strptime(str1, "%Y.%m.%d")
+    date2 = datetime.datetime.strptime(str2, "%Y.%m.%d")
     num = round((date1 - date2).days / 7)
     return num
 
@@ -165,12 +168,11 @@ def docx_processing(file, path_prefix):
     ret, ret2 = read_from_xlsx(file)
     # comm_task即可处理的文档：
     com_list = ['WN-QR-0-4-A 项目实施进度表-1.5.docx', 'WN-QR-2-12-A项目上线评估报告-1.5.docx', 'WN-QR-1-1-A 项目启动告客户书-1.5.docx',
-                'WN-QR-0-3-A软件及升级包杀毒记录-1.5.docx', 'WN-QR-0-1-A项目启动会会议记录-1.5.docx', 'WN-QR-1-5-A项目组成员清单-1.5.docx',
-                '-----WN-QR-2-5-A数据准备与验收清单-1.5.docx']
+                'WN-QR-0-1-A项目启动会会议记录-1.5.docx', 'WN-QR-1-5-A项目组成员清单-1.5.docx', '-----WN-QR-2-5-A数据准备与验收清单-1.5.docx']
     # comm_task之外需要另行做处理的文档：
     spc_list = ['WN-QR-4-3-A项目验收报告-1.5.docx', 'WN-QR-3-2-A系统切换方案-1.5.docx', 'WN-QR-2-4-A培训考核记录-1.5.docx',
                 'WN-QR-2-3-A培训签到表-1.5.docx', 'WN-QR-2-1-B培训计划-1.5.docx', 'WN-QR-1-4-A项目实施计划-1.5.docx',
-                '-----WN-QR-1-3-A项目功能范围确认单-1.5.docx', 'WN-QR-2-7-A工作底稿-1.5.docx']
+                '-----WN-QR-1-3-A项目功能范围确认单-1.5.docx', 'WN-QR-2-7-A工作底稿-1.5.docx', 'WN-QR-0-3-A软件及升级包杀毒记录-1.5.docx']
     if ret:
         for f in com_list:
             doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
@@ -238,11 +240,17 @@ def docx_processing(file, path_prefix):
                     doc.modify_tab(2, i + 2, 3, ret2[i][1])
                     doc.modify_tab(2, i + 2, 4, ret2[i][2])
                 doc.modify_tab(3, 1, 2, ret['变量16'])
-                date1 = datetime.datetime.strptime(ret['变量11'], "%Y年%m月%d日")
-                date2 = date1 + datetime.timedelta(days=7)
-                date3 = date2.strftime('%Y{y}%m{m}%d{d}').format(y='年', m='月', d='日')
-                doc.modify_tab2(4, 10, 4, f"{ret['变量11']}到{date3}")
-                doc.modify_tab2(4, 11, 4, f"{date3}到{ret['变量12']}")
+                begin = datetime.datetime.strptime(ret['变量11'], "%Y.%m.%d")
+                end = datetime.datetime.strptime(ret['变量12'], "%Y.%m.%d")
+                est_end = begin + datetime.timedelta(days=7)
+                if est_end >= end:
+                    rel_end = ret['变量12']
+                    doc.modify_tab2(4, 10, 4, f"{ret['变量11']}到{rel_end}")
+                    doc.modify_tab2(4, 11, 4, ret['变量12'])
+                else:
+                    rel_end = est_end.strftime('%Y{y}%m{m}%d{d}').format(y='.', m='.', d='')
+                    doc.modify_tab2(4, 10, 4, f"{ret['变量11']}到{rel_end}")
+                    doc.modify_tab2(4, 11, 4, f"{rel_end}到{ret['变量12']}")
                 doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
                 doc.close()
                 doc = None
@@ -267,6 +275,14 @@ def docx_processing(file, path_prefix):
                 doc.close()
                 doc = None
                 gc.collect()
+            elif f == 'WN-QR-0-3-A软件及升级包杀毒记录-1.5.docx':
+                doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
+                comm_task(doc, ret)
+                doc.replace_doc('系统（第一个）', ret2[0][0])
+                doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
+                doc.close()
+                doc = None
+                gc.collect()
         sg.PopupOK('处理完成。', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))
     else:
         sg.PopupOK('未能正确获取数据，请检查数据来源文件。', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))
@@ -282,12 +298,12 @@ layout = [
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表  v1.1 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.2 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
     if button == '退出':
-        exit()
+        window.Close()
     elif button is None:
         break
     elif button == '开始处理' and values[0] != '':
