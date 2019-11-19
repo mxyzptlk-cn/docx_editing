@@ -257,7 +257,7 @@ def docx_processing(file, path_prefix):
                 gc.collect()
             elif f == '-----WN-QR-1-3-A项目功能范围确认单-1.5.docx':
                 doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
-                doc.replace_doc('变量1', ret['变量1'])
+                doc.replace_header('变量1', ret['变量1'])  # 修改页眉
                 doc.ins_table_row(1, len(ret2) - 1)  # 根据子系统数量计算需要增加的表格行数
                 for i in range(len(ret2)):  # 系统模块情况表内容填充
                     doc.modify_tab(1, i + 2, 1, ret2[i][0])
@@ -298,7 +298,7 @@ layout = [
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表处理工具  v1.2 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.31 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
