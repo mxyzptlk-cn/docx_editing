@@ -15,7 +15,28 @@ import datetime
 import win32com
 from win32com.client import Dispatch
 
+import win32api
+import win32print
+
 from openpyxl import load_workbook as lb
+
+
+def get_printer_list():
+    printers = win32print.EnumPrinters(2)
+    def_printer = win32print.GetDefaultPrinter()
+    p_list = [def_printer]
+    for p in printers:
+        if not p[1].split(',')[0] == def_printer:
+            p_list.append(p[1].split(",")[0])
+    return p_list
+
+
+def print_file(filename, printer_name):
+    win32api.ShellExecute(0, "print", path_prefix + '\\处理完成' + '\\' + filename, '/d:"%s"' % printer_name, ".", 0)
+
+
+printer_list = get_printer_list()  # 获取打印机列表
+old_default_printer = printer_list[0]  # 记录原默认打印机
 
 
 def days(str1, str2):  # 计算周数，四舍五入
@@ -162,7 +183,7 @@ def comm_task(doc, ret):
             doc.replace_doc('变量' + str(i), ret['变量' + str(i)])  # 替换其他变量
 
 
-def docx_processing(file, path_prefix):
+def docx_processing(file, path_prefix, do_print, printer_name):
     if not os.path.exists(path_prefix + '\\处理完成'):
         os.makedirs(path_prefix + '\\处理完成')
     ret, ret2 = read_from_xlsx(file)
@@ -283,6 +304,11 @@ def docx_processing(file, path_prefix):
                 doc.close()
                 doc = None
                 gc.collect()
+        if do_print:
+            for f in com_list:
+                print_file(f, printer_name)
+            for f in spc_list:
+                print_file(f, printer_name)
         sg.PopupOK('处理完成。', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))
     else:
         sg.PopupOK('未能正确获取数据，请检查数据来源文件。', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))
@@ -292,26 +318,31 @@ layout = [
     [sg.Text('数据来源：', background_color='#A8CFDD', font=("Microsoft YaHei Light", 12))],
     [sg.Input(size=(50, 2), font=("Microsoft YaHei Light", 12)),
      sg.FileBrowse(button_text='选择文件', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))],
-    [sg.T(' ' * 80, background_color='#A8CFDD'),
+    [sg.Combo(printer_list, default_value=printer_list[0]),
+     sg.Checkbox('打印', font=("Microsoft YaHei Light", 12), size=(4, 1), background_color='#A8CFDD'),
      sg.Submit(size=(10, 1), button_text='开始处理', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray')),
      sg.Cancel(size=(10, 1), button_text='退出', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))],
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表处理工具  v1.31 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.4 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
     if button == '退出':
+        win32print.SetDefaultPrinter(old_default_printer)  # 重新设置原默认打印机
         window.Close()
     elif button is None:
         break
     elif button == '开始处理' and values[0] != '':
         path_prefix = os.getcwd()
         try:
-            docx_processing(values[0], path_prefix)
+            if values[2]:  # 勾选了打印
+                win32print.SetDefaultPrinter(values[1])
+            docx_processing(values[0], path_prefix, values[2], values[1])
         except Exception as e:
             sg.PopupOK(f'出错了：{str(e)}', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))
     else:
         sg.PopupOK('没有选择文件！', font=("Microsoft YaHei Light", 12), button_color=('white', 'gray'))
+win32print.SetDefaultPrinter(old_default_printer)  # 重新设置原默认打印机
 window.Close()
