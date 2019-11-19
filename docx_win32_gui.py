@@ -140,14 +140,15 @@ class RemoteWord:
 def read_from_xlsx(file):
     ret = {'变量1': None, '变量2': None, '变量3': None, '变量4': None, '变量5': None, '变量6': None, '变量7': None,
            '变量8': None, '变量9': None, '变量10': None, '变量11': None, '变量12': None, '变量13': None, '变量14': None,
-           '变量15': None, '变量16': None, '变量17': None, '变量18': None, '变量19': None, '变量20': None, '变量21': None}
+           '变量15': None, '变量16': None, '变量17': None, '变量18': None, '变量19': None, '变量20': None, '变量21': None,
+           '变量22': None, '变量23': None}
     ret2 = []
     
     wb = lb(file, data_only=True, keep_vba=False)
     ws = wb.active
     
     if ws['C1'].value and ws['C2'].value:
-        for i in range(1, 22):  # 变量1-21部分
+        for i in range(1, 24):  # 变量1-23部分
             if ws['C' + str(i)].value:
                 ret['变量' + str(i)] = ws['C' + str(i)].value
             else:
@@ -179,7 +180,7 @@ def comm_task(doc, ret):
                 doc.replace_doc('变量20', '无')
         elif i == 22:
             doc.replace_doc('变量22', str(days(ret['变量11'], ret['变量6'])))
-        elif i not in (20, 21, 22):
+        elif i not in (1, 20, 21, 22):
             doc.replace_doc('变量' + str(i), ret['变量' + str(i)])  # 替换其他变量
 
 
@@ -260,7 +261,7 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                     doc.modify_tab(2, i + 2, 2, ret2[i][0])
                     doc.modify_tab(2, i + 2, 3, ret2[i][1])
                     doc.modify_tab(2, i + 2, 4, ret2[i][2])
-                doc.modify_tab(3, 1, 2, ret['变量16'])
+                doc.modify_tab(3, 1, 2, ret['变量23'])
                 begin = datetime.datetime.strptime(ret['变量11'], "%Y.%m.%d")
                 end = datetime.datetime.strptime(ret['变量12'], "%Y.%m.%d")
                 est_end = begin + datetime.timedelta(days=7)
@@ -325,7 +326,7 @@ layout = [
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表处理工具  v1.4 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.41 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
