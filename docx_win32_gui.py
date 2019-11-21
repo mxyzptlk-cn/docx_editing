@@ -3,7 +3,7 @@
 # Author: Mxyzptlk
 # Date: 2019/11/16
 
-# v1.51
+# v1.52
 # pyinstaller -D -w -i logo.ico docx_win32_gui.py
 
 import PySimpleGUI as sg
@@ -121,8 +121,9 @@ class RemoteWord:
     
     # 合并单元格
     def merge_tab_cells(self, tab_num, row_num, cell_num, to_row_num, to_cell_num):  # 表格编号从1开始
-        self.doc.Tables(tab_num).Rows[row_num].Cells[cell_num].Merge(self.doc.Tables(tab_num).Rows[to_row_num].Cells[to_cell_num])
-
+        self.doc.Tables(tab_num).Rows[row_num].Cells[cell_num].Merge(
+            self.doc.Tables(tab_num).Rows[to_row_num].Cells[to_cell_num])
+    
     def ins_table_row(self, tab_num, row_num=1):
         for i in range(row_num):
             self.doc.Tables[tab_num - 1].Rows.Add()  # 源代码表格编号从0开始，这里+1，统一修改表格的编号设置
@@ -232,22 +233,6 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                 doc.close()
                 doc = None
                 gc.collect()
-            elif f == 'WN-QR-2-4-A培训考核记录-1.5.docx':
-                doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
-                comm_task(doc, ret)
-                doc.replace_doc('子系统（第一个）', ret2[0][1])
-                doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
-                doc.close()
-                doc = None
-                gc.collect()
-            elif f == 'WN-QR-2-3-A培训签到表-1.5.docx':
-                doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
-                comm_task(doc, ret)
-                doc.replace_doc('子系统（第一个）', ret2[0][1])
-                doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
-                doc.close()
-                doc = None
-                gc.collect()
             elif f == 'WN-QR-2-1-B培训计划-1.5.docx':
                 doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
                 comm_task(doc, ret)
@@ -297,14 +282,6 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                 doc.close()
                 doc = None
                 gc.collect()
-            elif f == 'WN-QR-2-7-A工作底稿-1.5.docx':
-                doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
-                comm_task(doc, ret)
-                doc.replace_doc('子系统（第一个）', ret2[0][1])
-                doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
-                doc.close()
-                doc = None
-                gc.collect()
             elif f == 'WN-QR-0-3-A软件及升级包杀毒记录-1.5.docx':
                 doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
                 comm_task(doc, ret)
@@ -313,6 +290,16 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                 doc.close()
                 doc = None
                 gc.collect()
+            elif f == 'WN-QR-2-4-A培训考核记录-1.5.docx' or 'WN-QR-2-3-A培训签到表-1.5.docx' \
+                    or 'WN-QR-2-7-A工作底稿-1.5.docx':
+                doc = RemoteWord(path_prefix + '\\' + '套表模板\\' + f)
+                comm_task(doc, ret)
+                doc.replace_doc('子系统（第一个）', ret2[0][1])
+                doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
+                doc.close()
+                doc = None
+                gc.collect()
+
         if do_print:
             for f in com_list:
                 print_file(f, printer_name)
@@ -334,7 +321,7 @@ layout = [
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表处理工具  v1.51 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.52 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
