@@ -3,8 +3,8 @@
 # Author: Mxyzptlk
 # Date: 2019/11/16
 
-# v1.2
-# pyinstaller -D -w -i C:\Users\Mxyzptlk\Documents\PycharmProjects\docx_editing\logo.ico docx_win32_gui.py
+# v1.5
+# pyinstaller -D -w -i logo.ico docx_win32_gui.py
 
 import PySimpleGUI as sg
 
@@ -119,6 +119,10 @@ class RemoteWord:
     def modify_tab2(self, tab_num, row_num, cell_num, text):  # 表格编号从1开始
         self.doc.Tables(tab_num).Cell(row_num, cell_num).Range.Text = text
     
+    # 合并单元格
+    def merge_tab_cells(self, tab_num, row_num, cell_num, to_row_num, to_cell_num):  # 表格编号从1开始
+        self.doc.Tables(tab_num).Rows[row_num].Cells[cell_num].Merge(self.doc.Tables(tab_num).Rows[to_row_num].Cells[to_cell_num])
+
     def ins_table_row(self, tab_num, row_num=1):
         for i in range(row_num):
             self.doc.Tables[tab_num - 1].Rows.Add()  # 源代码表格编号从0开始，这里+1，统一修改表格的编号设置
@@ -219,9 +223,11 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                 comm_task(doc, ret)
                 doc.ins_table_row(2, len(ret2) - 1)  # 根据子系统数量计算需要增加的表格行数
                 for i in range(len(ret2)):  # 系统模块情况表内容填充
-                    doc.modify_tab(2, i + 2, 1, f"第{ret['变量15']}期")
+                    # doc.modify_tab(2, i + 2, 1, f"第{ret['变量15']}期")
                     doc.modify_tab(2, i + 2, 2, ret2[i][0])
                     doc.modify_tab(2, i + 2, 3, ret2[i][1])
+                doc.merge_tab_cells(2, 1, 0, len(ret2), 0)
+                doc.modify_tab2(2, 2, 1, f"第{ret['变量15']}期")
                 doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
                 doc.close()
                 doc = None
@@ -326,7 +332,7 @@ layout = [
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表处理工具  v1.41 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.5 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
