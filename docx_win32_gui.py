@@ -3,7 +3,7 @@
 # Author: Mxyzptlk
 # Date: 2019/11/16
 
-# v1.5
+# v1.51
 # pyinstaller -D -w -i logo.ico docx_win32_gui.py
 
 import PySimpleGUI as sg
@@ -263,10 +263,12 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                 comm_task(doc, ret)
                 doc.ins_table_row(2, len(ret2) - 1)  # 根据子系统数量计算需要增加的表格行数
                 for i in range(len(ret2)):  # 系统模块情况表内容填充
-                    doc.modify_tab(2, i + 2, 1, f"第{ret['变量15']}期")
+                    # doc.modify_tab(2, i + 2, 1, f"第{ret['变量15']}期")
                     doc.modify_tab(2, i + 2, 2, ret2[i][0])
                     doc.modify_tab(2, i + 2, 3, ret2[i][1])
                     doc.modify_tab(2, i + 2, 4, ret2[i][2])
+                doc.merge_tab_cells(2, 1, 0, len(ret2), 0)
+                doc.modify_tab2(2, 2, 1, f"第{ret['变量15']}期")
                 doc.modify_tab(3, 1, 2, ret['变量23'])
                 begin = datetime.datetime.strptime(ret['变量11'], "%Y.%m.%d")
                 end = datetime.datetime.strptime(ret['变量12'], "%Y.%m.%d")
@@ -332,7 +334,7 @@ layout = [
 ]
 
 sg.ChangeLookAndFeel('TealMono')
-window = sg.Window('项目套表处理工具  v1.5 beta', icon="logo.ico").Layout(layout)
+window = sg.Window('项目套表处理工具  v1.51 beta', icon="logo.ico").Layout(layout)
 
 while True:
     button, values = window.Read()
