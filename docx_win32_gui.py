@@ -227,7 +227,8 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                     # doc.modify_tab(2, i + 2, 1, f"第{ret['变量15']}期")
                     doc.modify_tab(2, i + 2, 2, ret2[i][0])
                     doc.modify_tab(2, i + 2, 3, ret2[i][1])
-                doc.merge_tab_cells(2, 1, 0, len(ret2), 0)
+                if len(ret2) > 1:
+                    doc.merge_tab_cells(2, 1, 0, len(ret2), 0)
                 doc.modify_tab2(2, 2, 1, f"第{ret['变量15']}期")
                 doc.save_as(path_prefix + '\\处理完成' + '\\' + f)
                 doc.close()
@@ -252,7 +253,8 @@ def docx_processing(file, path_prefix, do_print, printer_name):
                     doc.modify_tab(2, i + 2, 2, ret2[i][0])
                     doc.modify_tab(2, i + 2, 3, ret2[i][1])
                     doc.modify_tab(2, i + 2, 4, ret2[i][2])
-                doc.merge_tab_cells(2, 1, 0, len(ret2), 0)
+                if len(ret2) > 1:
+                    doc.merge_tab_cells(2, 1, 0, len(ret2), 0)
                 doc.modify_tab2(2, 2, 1, f"第{ret['变量15']}期")
                 doc.modify_tab(3, 1, 2, ret['变量23'])
                 begin = datetime.datetime.strptime(ret['变量11'], "%Y.%m.%d")
